@@ -1,0 +1,16 @@
+categories:
+    css: 'div.a-subheader ul.a-unordered-list'
+    type: Text
+    format: Categories
+original_price:
+    css: tr:nth-of-type(1) span.priceBlockStrikePriceString
+    type: Text
+name:
+    css: span.a-size-large
+    type: Text
+sale_price:
+    css: 'td.a-span12 span.a-size-medium'
+    type: Text
+availability:
+    css: 'div.feature div.a-section div.feature div.a-section div.a-section span.a-size-medium'
+    type: Text
