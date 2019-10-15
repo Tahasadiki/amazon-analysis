@@ -14,25 +14,46 @@ def get_headers():
     headers = {"User-Agent": user_agent}
     return headers
 
-def get_page(url,headers):
-    page = None
+def get_page_details(url,headers,product_extractor):
+    product_details = None
     try:
         page = requests.get(url,headers=headers)
+        #extract product details from HTML
+        product_details = product_extractor.extract(page.text)
     except Exception as e:
         logging.error(e)
-    return page
+    return product_details
 
-def get_product_details(args):
+def get_urls(file_path):
+    list_urls = []
+
+    try:
+        with open(file_path,'r') as urls_file:
+            list_urls = urls_file.readlines()        
+    except Exception as e:
+        logging.error(e)
+
+    return list_urls
+
+def get_product_details(param,isFile=False):
     #instantiate the product extractor
     formatters = Formatter.get_all()
-    product_extractor = Extractor.from_yaml_file('amazon_scraper/selectors/product_selectors.yml',formatters=formatters)
+    selectors_path = os.path.join(os.path.dirname(__file__),"selectors/product_selectors.yml")
+    product_extractor = Extractor.from_yaml_file(selectors_path,formatters=formatters)
 
-    url = args["<product-url>"]
     headers = get_headers()
-    page = get_page(url=url,headers=headers)
+    
+    products_details = []
+    list_urls = []
+    if isFile:
+        file_path = param
+        list_urls.extend(get_urls(file_path))
+    else:
+        url = param
+        list_urls.append(url)
 
-    #extract product details from HTML
-    if page:
-        product_details = product_extractor.extract(page.text)
+    for url in list_urls:
+            product_details = get_page_details(url,headers,product_extractor)
+            products_details.append(product_details)
 
-    return product_details
+    return products_details
